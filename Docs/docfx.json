@@ -7,7 +7,7 @@
       "src": [
         {
           "files": [
-            "Singulink.Globalization.Currency/Singulink.Globalization.Currency.csproj"
+            "Singulink.Cryptography.PasswordChecker/Singulink.Cryptography.PasswordChecker.csproj"
           ],
           "src": "../Source"
         }
@@ -22,8 +22,8 @@
   ],
   "build": {
     "globalMetadata": {
-      "_appTitle": "Singulink.Globalization.Currency",
-      "_appName": "Currency",
+      "_appTitle": "Singulink.Cryptography.PasswordChecker",
+      "_appName": "Password Checker",
       "_appLogoPath": "images/logo.png",
       "_appFaviconPath": "images/favicon.png",
       "_copyrightFooter": "© Singulink. All rights reserved.",
