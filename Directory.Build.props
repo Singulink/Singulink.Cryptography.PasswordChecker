@@ -1,0 +1,33 @@
+<Project>
+  <PropertyGroup>
+    <LangVersion>preview</LangVersion>
+    <Nullable Condition="'$(TargetFramework)' != 'netstandard2.0'">enable</Nullable>
+    <Nullable Condition="'$(TargetFramework)' == 'netstandard2.0'">annotations</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+
+    <!-- TODO: Remove after documenting -->
+    <NoWarn>$(NoWarn);CS1591;SA1600;SA1602</NoWarn>
+
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+
+    <WeaverConfiguration>
+      <Weavers>
+        <RuntimeNullables />
+      </Weavers>
+    </WeaverConfiguration>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)' == 'Release'">
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <!-- Fody -->
+    <PackageReference Include="RuntimeNullables.Fody" Version="2.0.0" PrivateAssets="all" />
+
+    <!-- Analyzers -->
+    <PackageReference Include="DotNetAnalyzers.DocumentationAnalyzers" Version="1.0.0-beta.59" PrivateAssets="all" />
+    <PackageReference Include="StyleCop.Analyzers" Version="1.2.0-beta.556" PrivateAssets="all" />
+    <PackageReference Include="Roslynator.Analyzers" Version="4.11.0" PrivateAssets="all" />
+  </ItemGroup>
+</Project>
