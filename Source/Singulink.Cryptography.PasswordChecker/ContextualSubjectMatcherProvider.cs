@@ -1,85 +1,91 @@
 using System.Runtime.InteropServices;
-using Singulink.Cryptography.PasswordMatchers;
 
 namespace Singulink.Cryptography;
 
-public abstract class ContextualSubjectMatcherProvider : IContextualSubjectMatcherProvider
+public class ContextualSubjectMatcherProvider : IContextualSubjectMatcherProvider
 {
-    public static ContextualSubjectMatcherProvider Default { get; } = new DefaultSubjectMatcherProvider();
+    private static readonly ImmutableArray<char> DefaultDelimiters = ImmutableArray.Create(' ', ',', '.', '-', '_', '.', ':', ';', '@');
 
-    public abstract PasswordMatcher? GetMatcher(ContextualSubject subject);
+    public static ContextualSubjectMatcherProvider Default { get; } = new ContextualSubjectMatcherProvider();
 
-    private sealed class DefaultSubjectMatcherProvider : ContextualSubjectMatcherProvider
+    public ImmutableArray<char> Delimiters { get; }
+
+    protected ContextualSubjectMatcherProvider()
     {
-        private static readonly ImmutableArray<char> Delimiters = ImmutableArray.Create(' ', ',', '.', '-', '_', '.', ':', ';', '@');
+        Delimiters = DefaultDelimiters;
+    }
 
-        public override PasswordMatcher? GetMatcher(ContextualSubject subject)
+    public ContextualSubjectMatcherProvider(IEnumerable<char> delimiters)
+    {
+        Delimiters = delimiters.ToImmutableArray();
+    }
+
+    public virtual PasswordMatcher? GetMatcher(ContextualSubject subject)
+    {
+        string value = subject.Value;
+
+        if (subject.Type is ContextualSubjectType.Website)
         {
-            string value = subject.Value;
+            ReadOnlySpan<char> span = value;
 
-            if (subject.Type is ContextualSubjectType.Website)
-            {
-                ReadOnlySpan<char> span = value;
+            // Remove protocol prefix if present
 
-                // Remove protocol prefix if present
+            if (span.StartsWith("http://", StringComparison.OrdinalIgnoreCase))
+                span = span["http://".Length..];
+            else if (span.StartsWith("https://", StringComparison.OrdinalIgnoreCase))
+                span = span["https://".Length..];
 
-                if (span.StartsWith("http://", StringComparison.OrdinalIgnoreCase))
-                    span = span["http://".Length..];
-                else if (span.StartsWith("https://", StringComparison.OrdinalIgnoreCase))
-                    span = span["https://".Length..];
+            // Remove "www." prefix if present
 
-                // Remove "www." prefix if present
+            if (span.StartsWith("www.", StringComparison.OrdinalIgnoreCase))
+                span = span["www.".Length..];
 
-                if (span.StartsWith("www.", StringComparison.OrdinalIgnoreCase))
-                    span = span["www.".Length..];
+            // Remove anything after the first slash
 
-                // Remove anything after the first slash
+            int slashIndex = span.IndexOf('/');
 
-                int slashIndex = span.IndexOf('/');
+            if (slashIndex >= 0)
+                span = span[..slashIndex];
 
-                if (slashIndex >= 0)
-                    span = span[..slashIndex];
+            // Remove the TLD
 
-                // Remove the TLD
+            int tldDotIndex = span.LastIndexOf('.');
 
-                int tldDotIndex = span.LastIndexOf('.');
+            if (tldDotIndex > 0)
+                span = span[..tldDotIndex];
 
-                if (tldDotIndex > 0)
-                    span = span[..tldDotIndex];
+            if (span.Length != value.Length)
+                value = span.ToString();
+        }
+        else if (subject.Type is ContextualSubjectType.Email)
+        {
+            ReadOnlySpan<char> span = value;
 
-                if (span.Length != value.Length)
-                    value = span.ToString();
-            }
-            else if (subject.Type is ContextualSubjectType.Email)
-            {
-                ReadOnlySpan<char> span = value;
+            // Remove the TLD
 
-                // Remove the TLD
+            int atIndex = span.LastIndexOf('@');
+            int tldDotIndex = span.LastIndexOf('.');
 
-                int atIndex = span.LastIndexOf('@');
-                int tldDotIndex = span.LastIndexOf('.');
+            if (atIndex > 0 && tldDotIndex > atIndex)
+                span = span[..tldDotIndex];
 
-                if (atIndex > 0 && tldDotIndex > atIndex)
-                    span = span[..tldDotIndex];
+            if (span.Length != value.Length)
+                value = span.ToString();
+        }
 
-                if (span.Length != value.Length)
-                    value = span.ToString();
-            }
+        return GetPermutationsMatcher(value);
 
-            return GetPermutationsMatcher(value);
+        PasswordMatcher? GetPermutationsMatcher(string value)
+        {
+            string[] values = value.Split(ImmutableCollectionsMarshal.AsArray(Delimiters), StringSplitOptions.RemoveEmptyEntries);
 
-            static PasswordMatcher? GetPermutationsMatcher(string value)
-            {
-                string[] values = value.Split(ImmutableCollectionsMarshal.AsArray(Delimiters), StringSplitOptions.RemoveEmptyEntries);
+            if (values.Length is 0)
+                return null;
 
-                if (values.Length is 0)
-                    return null;
+            if (values.Length is 1)
+                return PasswordMatcher.Segment(value);
 
-                if (values.Length is 1)
-                    return PasswordMatcher.Segment(value);
-
-                return PasswordMatcher.Permutations(values.Select(v => PasswordMatcher.Segment(v)));
-            }
+            return PasswordMatcher.Permutations(values.Select(v => PasswordMatcher.Segment(v)));
         }
     }
 }

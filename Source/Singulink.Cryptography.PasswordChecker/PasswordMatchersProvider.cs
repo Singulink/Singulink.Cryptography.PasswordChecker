@@ -1,26 +1,20 @@
-using System.Text.RegularExpressions;
 using static Singulink.Cryptography.PasswordMatcher;
 using static Singulink.Cryptography.PasswordMatchers.CommonMatchers;
 
 namespace Singulink.Cryptography;
 
-public abstract class PasswordMatchersProvider : IPasswordMatchersProvider
+public class PasswordMatchersProvider : IPasswordMatchersProvider
 {
-    public static PasswordMatchersProvider Default { get; } = new DefaultPasswordMatchersProvider(ContextualSubjectMatcherProvider.Default);
+    public static PasswordMatchersProvider Default { get; } = new PasswordMatchersProvider(ContextualSubjectMatcherProvider.Default);
 
-    public abstract IEnumerable<PasswordMatcher> GetMatchers(IEnumerable<ContextualSubject>? subjects = null);
-}
-
-public class DefaultPasswordMatchersProvider : PasswordMatchersProvider
-{
     private readonly IContextualSubjectMatcherProvider _subjectMatcherProvider;
 
-    public DefaultPasswordMatchersProvider(IContextualSubjectMatcherProvider subjectMatcherProvider)
+    public PasswordMatchersProvider(IContextualSubjectMatcherProvider subjectMatcherProvider)
     {
         _subjectMatcherProvider = subjectMatcherProvider;
     }
 
-    public override IEnumerable<PasswordMatcher> GetMatchers(IEnumerable<ContextualSubject>? subjects = null)
+    public virtual IEnumerable<PasswordMatcher> GetMatchers(IEnumerable<ContextualSubject>? subjects = null)
     {
         // Subject matchers
 

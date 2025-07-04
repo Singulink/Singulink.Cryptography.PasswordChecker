@@ -9,7 +9,7 @@ public record PasswordMatchContext
     public ReadOnlySpan<char> RemainingChars => CheckedPassword.AsSpan(TotalMatchedLength);
 
     /// <summary>
-    /// Gets the last matched text (without separators).
+    /// Gets the last text that matched to the password (without separators).
     /// </summary>
     public string? LastMatchedText { get; private init; }
 

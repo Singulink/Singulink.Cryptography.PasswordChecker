@@ -1,4 +1,3 @@
-using System;
 using Singulink.Cryptography.PasswordMatchers;
 
 namespace Singulink.Cryptography;
