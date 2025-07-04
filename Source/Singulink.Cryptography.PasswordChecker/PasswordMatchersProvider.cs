@@ -29,28 +29,34 @@ public class DefaultPasswordMatchersProvider : PasswordMatchersProvider
             .OfType<PasswordMatcher>()
             .ToList() ?? [];
 
-        var subjectMatcher = Any([
+        var singleSubjectMatcher = Any([
             ..contextualSubjectMatchers,
             GeneralSubjectMatcher,
         ]);
 
+        var subjectMatcher = Sequence([
+            singleSubjectMatcher,
+            Optional(singleSubjectMatcher),
+        ]);
+
         var subjectWithOptionalDeterminerMatcher = Sequence([
-                Optional(DeterminerMatcher),
-                subjectMatcher,
-            ]);
+            Optional(SubjectDeterminerMatcher),
+            subjectMatcher,
+        ]);
 
         // Adjective matchers
 
         // Pattern: [prefix] adjective
         // Example: "[is] great"
         var adjectiveAfterSubjectMatcher = Sequence([
-            Optional(AdjectiveAfterSubjectPrefixMatcher),
+            Optional(SubjectToAdjectiveCopularVerbMatcher),
             AdjectiveMatcher,
         ]);
 
         // Pattern: [determiner] adjective
+        // Example: "[the] great"
         var adjectiveBeforeSubjectMatcher = Sequence([
-            Optional(DeterminerMatcher),
+            Optional(SubjectDeterminerMatcher),
             AdjectiveMatcher,
         ]);
 
@@ -67,81 +73,83 @@ public class DefaultPasswordMatchersProvider : PasswordMatchersProvider
         // Result common sequence matchers
         // -------------------------------
 
-        // Pattern: pwd prefix [pwd suffix]
+        // Pattern: (pwd prefix) [pwd suffix]
         // Example: qwerty [!!!]
         yield return Sequence([
             PasswordPrefixMatcher,
             Optional(PasswordSuffixMatcher),
         ]);
 
-        // Pattern: [pwd prefix] subject [subject] [subject] [pwd suffix]
-        // Example: [qwerty] password [password] [password] [123]
-        yield return Sequence([
-            Optional(PasswordPrefixMatcher),
+        // Pattern: subject [subject] [subject]
+        // Example: password [password] [password]
+        yield return PasswordSequence([
             subjectMatcher,
             Optional(subjectMatcher),
             Optional(subjectMatcher),
-            Optional(PasswordSuffixMatcher)
         ]);
 
-        // Pattern: [pwd prefix] [determiner]subject [[prefix]adjective] [pwd suffix]
-        // Example: [qwerty] [this] password [[is] great] [123]
-        yield return Sequence([
-            Optional(PasswordPrefixMatcher),
+        // Pattern: [determiner]subject [[prefix]adjective]
+        // Example: [this] password [[is] great]
+        yield return PasswordSequence([
             subjectWithOptionalDeterminerMatcher,
             Optional(adjectiveAfterSubjectMatcher),
-            Optional(PasswordSuffixMatcher)
         ]);
 
-        // Pattern: [pwd prefix] [determiner]adjective subject [pwd suffix]
-        // Example: [qwerty] [the] great password [123]
-        yield return Sequence([
-            Optional(PasswordPrefixMatcher),
+        // Pattern: [determiner]subject [copular verb] [determiner]subject
+        yield return PasswordSequence([
+            subjectWithOptionalDeterminerMatcher,
+            SubjectToSubjectCopularVerbMatcher,
+            subjectWithOptionalDeterminerMatcher,
+        ]);
+
+        // Pattern: [determiner]adjective subject
+        // Example: [the] great password
+        yield return PasswordSequence([
             adjectiveBeforeSubjectMatcher,
             subjectMatcher,
-            Optional(PasswordSuffixMatcher)
         ]);
 
-        // Pattern: [pwd prefix] [determiner]subject [prefix]adjective [determiner]subject [pwd suffix]
-        // Example: [qwerty] this [is a] bad password [123]
-        yield return Sequence([
-            Optional(PasswordPrefixMatcher),
+        // Pattern: [determiner]subject [prefix]adjective [determiner]subject
+        // Example: this [is a] bad password
+        yield return PasswordSequence([
             subjectWithOptionalDeterminerMatcher,
             adjectiveAfterSubjectMatcher,
             subjectWithOptionalDeterminerMatcher,
-            Optional(PasswordSuffixMatcher)
         ]);
 
-        // Pattern: [pwd prefix] [determiner]subject [conjunction] [determiner]subject [[prefix]adjective] [pwd suffix]
-        // Example: [qwerty] [this] password [and] [the] appname [[is] great] [123]
-        yield return Sequence([
-            Optional(PasswordPrefixMatcher),
+        // Pattern: [determiner]subject [conjunction] [determiner]subject [[prefix]adjective]
+        // Example: [this] password [and] [the] appname [[is] great]
+        yield return PasswordSequence([
             subjectWithOptionalDeterminerMatcher,
-            Optional(SubjectConjunctionMatcher),
+            Optional(ConjunctionMatcher),
             subjectWithOptionalDeterminerMatcher,
             Optional(adjectiveAfterSubjectMatcher),
-            Optional(PasswordSuffixMatcher)
         ]);
 
-        // Pattern: [pwd prefix] [determiner]subject verb[suffix] verb [pwd suffix]
-        // Example: [qwerty] [this] admin loves [to] login [123]
-        yield return Sequence([
-            Optional(PasswordPrefixMatcher),
+        // Pattern: [determiner]subject verb[suffix] verb
+        // Example: [this] admin loves [to] login
+        yield return PasswordSequence([
             subjectWithOptionalDeterminerMatcher,
             verbWithOptionalSuffixMatcher,
             VerbMatcher,
-            Optional(PasswordSuffixMatcher)
         ]);
 
-        // Pattern: [pwd prefix] [determiner]subject verb[suffix] [verb[suffix]] [determiner]subject [pwd suffix]
-        // Example: [qwerty] [this] admin loves [to] log in[to] appname [123]
-        yield return Sequence([
-            Optional(PasswordPrefixMatcher),
+        // Pattern: [determiner]subject verb[suffix] [verb[suffix]] [determiner]subject
+        // Example: [this] admin loves [to] log in[to] appname
+        yield return PasswordSequence([
             subjectWithOptionalDeterminerMatcher,
             verbWithOptionalSuffixMatcher,
             Optional(verbWithOptionalSuffixMatcher),
             subjectWithOptionalDeterminerMatcher,
-            Optional(PasswordSuffixMatcher)
         ]);
+
+        PasswordMatcher PasswordSequence(IEnumerable<PasswordMatcher> matchers)
+        {
+            return Sequence([
+                Optional(PasswordPrefixMatcher),
+                ..matchers,
+                Optional(PasswordSuffixMatcher)
+            ]);
+        }
     }
 }

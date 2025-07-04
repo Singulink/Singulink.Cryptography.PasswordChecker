@@ -1,3 +1,5 @@
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+
 namespace Singulink.Cryptography.Tests;
 
 [PrefixTestClass]
@@ -50,7 +52,7 @@ public sealed class PasswordCheckerTests
     [TestMethod]
     public void Subject_RepeatSequence_IsMatch()
     {
-        string password = "password 123123 123123";
+        string password = "password.123123.123123";
 
         var result = PasswordChecker.Default.CheckPassword(password);
 
@@ -60,7 +62,7 @@ public sealed class PasswordCheckerTests
 
     public void RepeatSubject_IsMatch()
     {
-        string password = "PasswordPassword PasswordPassword";
+        string password = "PasswordPassword-PasswordPassword";
 
         var result = PasswordChecker.Default.CheckPassword(password);
 
@@ -80,6 +82,28 @@ public sealed class PasswordCheckerTests
     }
 
     [TestMethod]
+    public void PrefixedAdjective_Subject_WithSeparators_IsMatch()
+    {
+        string password = "the_bad_admin";
+
+        var result = PasswordChecker.Default.CheckPassword(password);
+
+        result.Matched.ShouldBeTrue();
+        result.MatchedValues.ShouldBe(["the", "bad", "admin"]);
+    }
+
+    [TestMethod]
+    public void Subject_CopularVerb_PrefixedAdjective_Subject_IsMatch()
+    {
+        string password = "IAmABad@dmin";
+
+        var result = PasswordChecker.Default.CheckPassword(password);
+
+        result.Matched.ShouldBeTrue();
+        result.MatchedValues.ShouldBe(["i", "am", "a", "bad", "admin"]);
+    }
+
+    [TestMethod]
     public void RepeatedNameSubject_SuffixedVerb_RepeatedWebsiteSubject_CommonSuffix_IsMatch()
     {
         string password = "MikeMikeLogInToSingulinkSingulink1!";
@@ -93,7 +117,55 @@ public sealed class PasswordCheckerTests
         result.MatchedValues.ShouldBe(["mike", "mike", "login", "to", "singulink", "singulink", "1", "!"]);
     }
 
-    public void NoMatch()
+    [TestMethod]
+    public void SuffixedVerb_RepeatedWebsiteSubject_RepeatedNameSubject_CommonSuffix_IsMatch()
+    {
+        string password = "LogInToSingulinkSingulinkMikeMike1!";
+
+        var result = PasswordChecker.Default.CheckPassword(password, [
+            new(ContextualSubjectType.Website, "https://www.singulink.com"),
+            new(ContextualSubjectType.Name, "Mike Smith")
+        ]);
+
+        result.Matched.ShouldBeTrue();
+        result.MatchedValues.ShouldBe(["login", "to", "singulink", "singulink", "mike", "mike", "1", "!"]);
+    }
+
+    [TestMethod]
+    public void Subject_SubjectJoiner_PrefixedSubject_IsMatch()
+    {
+        string password = "you are a noob";
+
+        var result = PasswordChecker.Default.CheckPassword(password);
+        result.Matched.ShouldBeTrue();
+
+        result.MatchedValues.ShouldBe(["you", "are", "a", "noob"]);
+    }
+
+    [TestMethod]
+    public void Subject_SubjectJoiner_PrefixedAdjective_Subject_IsMatch()
+    {
+        string password = "you are a bad noob";
+
+        var result = PasswordChecker.Default.CheckPassword(password);
+        result.Matched.ShouldBeTrue();
+
+        result.MatchedValues.ShouldBe(["you", "are", "a", "bad", "noob"]);
+    }
+
+    [TestMethod]
+    public void Subject_SubjectJoiner_PrefixedAdjective2_Subject_IsMatch()
+    {
+        string password = "you are not a bad noob";
+
+        var result = PasswordChecker.Default.CheckPassword(password);
+        result.Matched.ShouldBeTrue();
+
+        result.MatchedValues.ShouldBe(["you", "are", "not", "a", "bad", "noob"]);
+    }
+
+    [TestMethod]
+    public void NoMatches()
     {
         string password = "thisisnotamatch";
         var result = PasswordChecker.Default.CheckPassword(password);

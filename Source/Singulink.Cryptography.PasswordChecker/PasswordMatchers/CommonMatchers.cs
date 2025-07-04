@@ -12,22 +12,13 @@ public static class CommonMatchers
     /// </summary>
     public static PasswordMatcher YearMatcher { get; } = FixedDigits(4, 1900, 2099);
 
-    public static PasswordMatcher AdjectiveAfterSubjectPrefixMatcher { get; } = Any([
-        SegmentSequence(["is", "not?", "the?"], parseOptionalSegments: true),
-        SegmentSequence(["is", "not?", "a?"], parseOptionalSegments: true),
-        SegmentSequence(["is", "so?"], parseOptionalSegments: true),
-        SegmentSequence(["are", "not?", "the?"], parseOptionalSegments: true),
-        SegmentSequence(["are", "so?"], parseOptionalSegments: true),
-        SegmentSequence(["am", "not?", "the?"], parseOptionalSegments: true),
-        SegmentSequence(["am", "so?"], parseOptionalSegments: true),
-    ]);
-
     public static PasswordMatcher AdjectiveMatcher { get; } = Any([
         Segment("best"),
         Segment("worst"),
         Segment("good"),
         Segment("bad"),
         Segment("cool"),
+        Segment("coolest"),
         Segment("great"),
         Segment("awesome"),
         Segment("amazing"),
@@ -38,13 +29,37 @@ public static class CommonMatchers
         Segment("hot"),
     ]);
 
-    public static PasswordMatcher SubjectConjunctionMatcher { get; } = Any([
+    public static PasswordMatcher SubjectToAdjectiveDeterminerMatcher { get; } = Any([
+        Segment("the"),
+        Segment("a"),
+        Segment("an"),
+    ]);
+
+    public static PasswordMatcher SubjectToAdjectiveModifierMatcher { get; } = Any([
+        Segment("so"),
+        Segment("very"),
+        Segment("too"),
+    ]);
+
+    public static PasswordMatcher SubjectToAdjectiveCopularVerbMatcher { get; } = Any([
+        Sequence([Segment("is"), OptionalSegment("not"), Optional(SubjectToAdjectiveModifierMatcher), Optional(SubjectToAdjectiveDeterminerMatcher)]),
+        Sequence([Segment("are"), OptionalSegment("not"), Optional(SubjectToAdjectiveModifierMatcher), Optional(SubjectToAdjectiveDeterminerMatcher)]),
+        Sequence([Segment("am"), OptionalSegment("not"), Optional(SubjectToAdjectiveModifierMatcher), Optional(SubjectToAdjectiveDeterminerMatcher)]),
+    ]);
+
+    public static PasswordMatcher SubjectToSubjectCopularVerbMatcher { get; } = Any([
+        Sequence([Segment("is"), OptionalSegment("not")]),
+        Sequence([Segment("are"), OptionalSegment("not")]),
+        Sequence([Segment("am"), OptionalSegment("not")]),
+    ]);
+
+    public static PasswordMatcher ConjunctionMatcher { get; } = Any([
         Segment("and"),
         Segment("or"),
         Segment("to"),
     ]);
 
-    public static PasswordMatcher DeterminerMatcher { get; } = Any([
+    public static PasswordMatcher SubjectDeterminerMatcher { get; } = Any([
         Segment("the"),
         Segment("a"),
         Segment("an"),
@@ -117,6 +132,7 @@ public static class CommonMatchers
         Segment("god"),
         Segment("whatever"),
         Segment("love"),
+        Segment("sex"),
         SegmentPermutations(["donald", "trump"]),
         SegmentPermutations(["joe", "biden"]),
 
