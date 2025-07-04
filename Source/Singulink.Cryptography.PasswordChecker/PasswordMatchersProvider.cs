@@ -80,11 +80,10 @@ public class DefaultPasswordMatchersProvider : PasswordMatchersProvider
             Optional(PasswordSuffixMatcher),
         ]);
 
-        // Pattern: subject [subject] [subject]
-        // Example: password [password] [password]
+        // Pattern: subject [subject] [subject] [subject]
+        // Example: password [password] [password] [password]
         yield return PasswordSequence([
-            subjectMatcher,
-            Optional(subjectMatcher),
+            subjectMatcher, // matches up to 2 consecutive subjects
             Optional(subjectMatcher),
         ]);
 

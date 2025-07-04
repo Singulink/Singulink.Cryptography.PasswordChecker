@@ -57,6 +57,9 @@ public static class CommonMatchers
         Segment("and"),
         Segment("or"),
         Segment("to"),
+        Segment("in"),
+        Segment("into"),
+        SegmentSequence(["in", "to"]),
     ]);
 
     public static PasswordMatcher SubjectDeterminerMatcher { get; } = Any([
@@ -74,6 +77,7 @@ public static class CommonMatchers
         Segment("their"),
         Segment("trusted"),
         Segment("into"),
+        Segment("let"),
     ]);
 
     public static PasswordMatcher GeneralSubjectMatcher { get; } = Any([
@@ -97,6 +101,10 @@ public static class CommonMatchers
         Segment("login"),
         SegmentSequence(["log", "in"]),
         Segment("secret"),
+
+        Segment("welcome"),
+        Segment("hello"),
+        Segment("hi"),
 
         Segment("master"),
         Segment("admin"),
@@ -135,6 +143,8 @@ public static class CommonMatchers
         Segment("sex"),
         SegmentPermutations(["donald", "trump"]),
         SegmentPermutations(["joe", "biden"]),
+        Segment("starwars"),
+        SegmentSequence(["star", "wars"]),
 
         Segment("69", checkSubstitutions: false),
         Segment("420", checkSubstitutions: false),
@@ -152,8 +162,11 @@ public static class CommonMatchers
         Segment("wants"),
         Segment("trust"),
         Segment("trusts"),
+
         Segment("login"),
         SegmentSequence(["log", "in"]),
+
+        Segment("let"),
     ]);
 
     public static PasswordMatcher VerbSuffixMatcher { get; } = Segment("to");

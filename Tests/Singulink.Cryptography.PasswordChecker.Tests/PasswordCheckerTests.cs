@@ -50,7 +50,7 @@ public sealed class PasswordCheckerTests
     }
 
     [TestMethod]
-    public void Subject_RepeatSequence_IsMatch()
+    public void Subject_RepeatKeyboardSequence_WithSeparators_IsMatch()
     {
         string password = "password.123123.123123";
 
@@ -58,6 +58,16 @@ public sealed class PasswordCheckerTests
 
         result.Matched.ShouldBeTrue();
         result.MatchedValues.ShouldBe(["password", "123", "123", "123", "123"]);
+    }
+
+    public void Subject_TwoKeyboardSequences_IsMatch()
+    {
+        string password = "password123UIOP{}|";
+
+        var result = PasswordChecker.Default.CheckPassword(password);
+
+        result.Matched.ShouldBeTrue();
+        result.MatchedValues.ShouldBe(["password", "123", "uiop{}"]);
     }
 
     public void RepeatSubject_IsMatch()
@@ -82,9 +92,9 @@ public sealed class PasswordCheckerTests
     }
 
     [TestMethod]
-    public void PrefixedAdjective_Subject_WithSeparators_IsMatch()
+    public void PrefixedAdjective_Subject_WithDifferentSeparators_IsMatch()
     {
-        string password = "the_bad_admin";
+        string password = "the_bad-admin";
 
         var result = PasswordChecker.Default.CheckPassword(password);
 
@@ -93,7 +103,7 @@ public sealed class PasswordCheckerTests
     }
 
     [TestMethod]
-    public void Subject_CopularVerb_PrefixedAdjective_Subject_IsMatch()
+    public void Subject_CopularVerb_PrefixedAdjective_L33tSubject_IsMatch()
     {
         string password = "IAmABad@dmin";
 
@@ -132,24 +142,24 @@ public sealed class PasswordCheckerTests
     }
 
     [TestMethod]
-    public void Subject_SubjectJoiner_PrefixedSubject_IsMatch()
+    public void Subject_SubjectJoiner_PrefixedSubject_WithSeparators_IsMatch()
     {
         string password = "you are a noob";
 
         var result = PasswordChecker.Default.CheckPassword(password);
-        result.Matched.ShouldBeTrue();
 
+        result.Matched.ShouldBeTrue();
         result.MatchedValues.ShouldBe(["you", "are", "a", "noob"]);
     }
 
     [TestMethod]
-    public void Subject_SubjectJoiner_PrefixedAdjective_Subject_IsMatch()
+    public void Subject_SubjectJoiner_PrefixedAdjective_Subject_WithSeparators_IsMatch()
     {
         string password = "you are a bad noob";
 
         var result = PasswordChecker.Default.CheckPassword(password);
-        result.Matched.ShouldBeTrue();
 
+        result.Matched.ShouldBeTrue();
         result.MatchedValues.ShouldBe(["you", "are", "a", "bad", "noob"]);
     }
 
@@ -159,9 +169,42 @@ public sealed class PasswordCheckerTests
         string password = "you are not a bad noob";
 
         var result = PasswordChecker.Default.CheckPassword(password);
-        result.Matched.ShouldBeTrue();
 
+        result.Matched.ShouldBeTrue();
         result.MatchedValues.ShouldBe(["you", "are", "not", "a", "bad", "noob"]);
+    }
+
+    [TestMethod]
+    public void WelcomeTo_Subject_IsMatch()
+    {
+        string password = "welcometoadmin";
+
+        var result = PasswordChecker.Default.CheckPassword(password);
+
+        result.Matched.ShouldBeTrue();
+        result.MatchedValues.ShouldBe(["welcome", "to", "admin"]);
+    }
+
+    [TestMethod]
+    public void LetMeIn_Subject_IsMatch()
+    {
+        string password = "letmeinadmin";
+
+        var result = PasswordChecker.Default.CheckPassword(password);
+
+        result.Matched.ShouldBeTrue();
+        result.MatchedValues.ShouldBe(["let", "me", "in", "admin"]);
+    }
+
+    [TestMethod]
+    public void LetMeInto_Subject_IsMatch()
+    {
+        string password = "letmeintoadmin";
+
+        var result = PasswordChecker.Default.CheckPassword(password);
+
+        result.Matched.ShouldBeTrue();
+        result.MatchedValues.ShouldBe(["let", "me", "into", "admin"]);
     }
 
     [TestMethod]
