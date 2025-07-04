@@ -33,6 +33,8 @@ More information is coming soon, but for now you can have a [look at the tests](
 
 The default [`PasswordMatchersProvider`](https://github.com/Singulink/Singulink.Cryptography.PasswordChecker/blob/main/Source/Singulink.Cryptography.PasswordChecker/PasswordMatchersProvider.cs) implementation returns a set of matchers that cover the most easily dictionary attacked password patterns using curated common password data in [`CommonMatchers`](https://github.com/Singulink/Singulink.Cryptography.PasswordChecker/blob/main/Source/Singulink.Cryptography.PasswordChecker/PasswordMatchers/CommonMatchers.cs) and contextual subjects you provide (i.e. the name of your service, the user's name / email address / etc). It matches with the top ~100 most common password words used in an easily predictable order.
 
+If the password checker returns a match, you should display a message to the user something along the lines of `"Password matches our dictionary of contextual or top 100 common word variations in a predictable order. Please add a word or two (uncommon words are better) to your password to make it less predictable and succeptible to attacks"`. You can optionally display the list of matched words to the user so they can see the basic phrase their variation matched to.
+
 The library is written to be extensible, so you can easily add your own matchers or override the default ones if you want to customize the behavior.
 
 ## Further Reading
