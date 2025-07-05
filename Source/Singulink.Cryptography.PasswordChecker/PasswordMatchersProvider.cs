@@ -88,7 +88,8 @@ public class PasswordMatchersProvider : IPasswordMatchersProvider
             Optional(adjectiveAfterSubjectMatcher),
         ]);
 
-        // Pattern: [determiner]subject [copular verb] [determiner]subject
+        // Pattern: [determiner]subject (copular verb) [determiner]subject
+        // Example: [the] password [is] [a] password
         yield return PasswordSequence([
             subjectWithOptionalDeterminerMatcher,
             SubjectToSubjectCopularVerbMatcher,
