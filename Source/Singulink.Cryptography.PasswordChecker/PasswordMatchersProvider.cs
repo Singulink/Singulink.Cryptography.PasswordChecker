@@ -63,9 +63,9 @@ public class PasswordMatchersProvider : IPasswordMatchersProvider
             Optional(VerbSuffixMatcher),
         ]);
 
-        // -------------------------------
-        // Result common sequence matchers
-        // -------------------------------
+        // ----------------------------------
+        // Resulting common sequence matchers
+        // ----------------------------------
 
         // Pattern: (pwd prefix) [pwd suffix]
         // Example: qwerty [!!!]
@@ -110,11 +110,19 @@ public class PasswordMatchersProvider : IPasswordMatchersProvider
             subjectWithOptionalDeterminerMatcher,
         ]);
 
+        // Pattern: [[determiner]subject [copular verb]] adjective [conjunction] [determiner]subject
+        // Example: [i [am]] cool as [a] ninja
+        yield return PasswordSequence([
+            Optional(Sequence([subjectWithOptionalDeterminerMatcher, SubjectToSubjectCopularVerbMatcher])),
+            Sequence([AdjectiveMatcher, Optional(AdjectiveToSubjectConjunctionMatcher)]),
+            subjectWithOptionalDeterminerMatcher,
+        ]);
+
         // Pattern: [determiner]subject [conjunction] [determiner]subject [[prefix]adjective]
         // Example: [this] password [and] [the] appname [[is] great]
         yield return PasswordSequence([
             subjectWithOptionalDeterminerMatcher,
-            Optional(ConjunctionMatcher),
+            Optional(SubjectConjunctionMatcher),
             subjectWithOptionalDeterminerMatcher,
             Optional(adjectiveAfterSubjectMatcher),
         ]);

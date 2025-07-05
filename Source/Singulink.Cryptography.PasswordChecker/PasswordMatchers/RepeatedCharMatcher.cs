@@ -22,7 +22,9 @@ public class RepeatedCharMatcher : ValueMatcher
         CharFilter = charFilter;
     }
 
-    protected override IEnumerable<PasswordMatchContext> GetValueMatches(PasswordMatchContext context)
+    protected override IEnumerable<PasswordMatchContext> GetValueMatches(PasswordMatchContext context) => GetValueMatchesImpl(context).Reverse();
+
+    private IEnumerable<PasswordMatchContext> GetValueMatchesImpl(PasswordMatchContext context)
     {
         if (context.RemainingChars.Length < MinCount)
             yield break;

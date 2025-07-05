@@ -12,9 +12,9 @@ public class SequenceMatcher : PasswordMatcher
             throw new ArgumentException($"{typeof(SequenceMatcher).Name} cannot contain only optional matchers.", nameof(matchers));
     }
 
-    protected internal override IEnumerable<PasswordMatchContext> GetMatches(PasswordMatchContext context) => GetMatches(context);
+    protected internal override IEnumerable<PasswordMatchContext> GetMatches(PasswordMatchContext context) => GetMatches(context, 0);
 
-    private IEnumerable<PasswordMatchContext> GetMatches(PasswordMatchContext context, int index = 0)
+    private IEnumerable<PasswordMatchContext> GetMatches(PasswordMatchContext context, int index)
     {
         if (index >= Matchers.Length)
         {

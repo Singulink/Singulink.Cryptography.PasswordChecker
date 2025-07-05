@@ -11,21 +11,13 @@ public static class KeyboardData
     /// Gets the rows for the English (US) keyboard layout.
     /// </summary>
     public static ImmutableArray<string> EnglishUSRows { get; } = [
-        // Normal
         @"`1234567890-=\",
         @"qwertyuiop[]\",
         @"asdfghjkl;'",
         @"zxcvbnm,./",
-
-        // Shifted
-        @"~!@#$%^&*()_+|",
-        @"QWERTYUIOP{}|",
-        @"ASDFGHJKL:""",
-        @"ZXCVBNM<>?",
     ];
 
     public static ImmutableArray<string> EnglishUSForwardDiagonals { get; } = [
-        // Normal
         @"1qaz",
         @"2wsx",
         @"3edc",
@@ -38,24 +30,9 @@ public static class KeyboardData
         @"0p;/",
         @"-['",
         @"=]",
-
-        // Shifted
-        @"!QAZ",
-        @"@WSX",
-        @"#EDC",
-        @"$RFV",
-        @"%TGB",
-        @"^YHN",
-        @"&UJM",
-        @"*IK<",
-        @"(OL>",
-        @")P:?",
-        @"_{""",
-        @"+}",
     ];
 
     public static ImmutableArray<string> EnglishUSBackwardDiagonals { get; } = [
-        // Normal
         @"2q",
         @"3wa",
         @"4esz",
@@ -68,23 +45,9 @@ public static class KeyboardData
         @"-pl,",
         @"=[;.",
         @"\]'/",
-
-        // Shifted
-        @"@Q",
-        @"#WA",
-        @"$ESZ",
-        @"%RDX",
-        @"^TFC",
-        @"&YGV",
-        @"*UHB",
-        @"(IJN",
-        @")OKM",
-        @"_PL<",
-        @"+{:>",
-        @"|}""?"
     ];
 
-    public static ImmutableArray<string> EnglishUSKeyAndShiftedKey { get; } = [
+    public static ImmutableArray<string> EnglishUSKeysToShiftedKeys { get; } = [
         @"`~",
         @"1!",
         @"2@",

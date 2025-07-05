@@ -59,6 +59,11 @@ public abstract class PasswordMatcher
         return new KeyboardSequenceMatcher(sequenceTypes, matchTrailingSeparator);
     }
 
+    public static PasswordMatcher Optional(PasswordMatcher matcher)
+    {
+        return new OptionalMatcher(matcher);
+    }
+
     public static PasswordMatcher Permutations(IEnumerable<PasswordMatcher> matchers, bool mustMatchAllMatchers = false)
     {
         return new PermutationsMatcher(matchers, mustMatchAllMatchers);
@@ -83,7 +88,7 @@ public abstract class PasswordMatcher
     {
         return new SequenceMatcher(
             segments.Select(s => parseOptionalSegments && s is [.., '?'] ?
-                OptionalSegment(s[..^1], checkSubstitutions, matchTrailingSeparators) :
+                Optional(Segment(s[..^1], checkSubstitutions, matchTrailingSeparators)) :
                 Segment(s, checkSubstitutions, matchTrailingSeparators)));
     }
 
@@ -95,25 +100,5 @@ public abstract class PasswordMatcher
     public static PasswordMatcher Sequence(IEnumerable<PasswordMatcher> matchers)
     {
         return new SequenceMatcher(matchers);
-    }
-
-    public static PasswordMatcher Optional(PasswordMatcher matcher)
-    {
-        return new OptionalMatcher(matcher);
-    }
-
-    public static PasswordMatcher OptionalAny(IEnumerable<PasswordMatcher> matchers)
-    {
-        return Optional(new AnyMatcher(matchers));
-    }
-
-    public static PasswordMatcher OptionalPermutations(IEnumerable<PasswordMatcher> matchers, bool mustMatchAllMatchers = false)
-    {
-        return Optional(Permutations(matchers, mustMatchAllMatchers));
-    }
-
-    public static PasswordMatcher OptionalSegment(string segment, bool checkSubstitutions = true, bool matchTrailingSeparator = true)
-    {
-        return Optional(Segment(segment, checkSubstitutions, matchTrailingSeparator));
     }
 }

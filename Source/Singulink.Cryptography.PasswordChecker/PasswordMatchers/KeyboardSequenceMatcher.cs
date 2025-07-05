@@ -20,7 +20,9 @@ public class KeyboardSequenceMatcher : ValueMatcher
         SequenceTypes = sequenceTypes;
     }
 
-    protected override IEnumerable<PasswordMatchContext> GetValueMatches(PasswordMatchContext context)
+    protected override IEnumerable<PasswordMatchContext> GetValueMatches(PasswordMatchContext context) => GetValueMatchesImpl(context).Distinct().Reverse();
+
+    private IEnumerable<PasswordMatchContext> GetValueMatchesImpl(PasswordMatchContext context)
     {
         if ((SequenceTypes & KeyboardSequenceTypes.Row) is not 0)
         {
@@ -30,18 +32,20 @@ public class KeyboardSequenceMatcher : ValueMatcher
 
                 for (int i = 0; i <= row.Length - 3; i++)
                 {
-                    if (context.RemainingChars.StartsWith(row.AsSpan(i, 3), StringComparison.OrdinalIgnoreCase))
+                    if (context.RemainingChars.StartsWith(row.AsSpan(i, 3), StringComparison.Ordinal))
                     {
-                        var matchContext = context.CreateChild(3, row.Substring(i, 3));
+                        var matchContext = context.CreateChild(3, row.Substring(i, 3).ToUpperInvariant());
                         yield return matchContext;
 
-                        // Check for each additional character match and yield each one
+                        // Check for each additional character match
 
-                        for (int j = i + 3; j < row.Length && j < context.RemainingChars.Length; j++)
+                        int currentChildMatchingLength = 4;
+
+                        for (int j = i + 3; j < row.Length && matchContext.RemainingChars.Length > 0; j++)
                         {
-                            if (context.RemainingChars[j] == row[j])
+                            if (matchContext.RemainingChars[0] == row[j])
                             {
-                                matchContext = context.CreateChild(j + 1, matchContext.LastMatchedText + row[j]);
+                                matchContext = context.CreateChild(currentChildMatchingLength++, matchContext.LastMatchedText + char.ToUpperInvariant(row[j]));
                                 yield return matchContext;
                             }
                             else
@@ -53,13 +57,23 @@ public class KeyboardSequenceMatcher : ValueMatcher
                 }
             }
         }
+
+        // TODO: Add additional keyboard sequence types.
     }
 
     private static ImmutableArray<string> GetRows()
     {
         var forward = KeyboardData.EnglishUSRows.Select(r => r.ToLowerInvariant()).ToImmutableArray();
         var backward = forward.Select(r => new string(r.Reverse().ToArray())).ToImmutableArray();
+        var forwardShifted = forward.Select(r => new string(r.Select(GetShifted).ToArray())).ToImmutableArray();
+        var backwardShifted = backward.Select(r => new string(r.Select(GetShifted).ToArray())).ToImmutableArray();
 
-        return [.. forward, .. backward];
+        return [..forward, ..backward, ..forwardShifted, ..backwardShifted];
+    }
+
+    private static char GetShifted(char c)
+    {
+        string ks = KeyboardData.EnglishUSKeysToShiftedKeys.FirstOrDefault(ks => ks[0] == c);
+        return ks is not null ? ks[1] : c;
     }
 }

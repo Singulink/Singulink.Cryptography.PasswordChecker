@@ -1,6 +1,6 @@
 namespace Singulink.Cryptography;
 
-public record PasswordMatchContext
+public sealed record PasswordMatchContext
 {
     public string OriginalPassword { get; }
 
@@ -41,5 +41,26 @@ public record PasswordMatchContext
             TotalMatchedLength = TotalMatchedLength + length,
             ParentContext = this,
         };
+    }
+
+    public bool Equals(PasswordMatchContext? other)
+    {
+        if (ReferenceEquals(this, other))
+            return true;
+
+        if (other is null)
+            return false;
+
+        return OriginalPassword == other.OriginalPassword &&
+               LastMatchedText == other.LastMatchedText &&
+               TotalMatchedLength == other.TotalMatchedLength &&
+               ParentContext == other.ParentContext;
+    }
+
+    public override int GetHashCode() => HashCode.Combine(OriginalPassword, LastMatchedText, TotalMatchedLength, ParentContext);
+
+    public override string ToString()
+    {
+        return $@"Remaining: ""{RemainingChars.ToString()}""({RemainingChars.Length} chars), LastMatched: ""{LastMatchedText}"", TotalMatched: {TotalMatchedLength}";
     }
 }

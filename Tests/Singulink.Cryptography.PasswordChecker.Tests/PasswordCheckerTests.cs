@@ -22,7 +22,7 @@ public sealed class PasswordCheckerTests
         var result = PasswordChecker.Default.CheckPassword(password);
 
         result.Matched.ShouldBeTrue();
-        result.MatchedValues.ShouldBe(["qwert", "password", "1975"]);
+        result.MatchedValues.ShouldBe(["QWERT", "password", "1975"]);
     }
 
     [TestMethod]
@@ -37,7 +37,7 @@ public sealed class PasswordCheckerTests
     }
 
     [TestMethod]
-    public void TwoL33tEmailSubjectParts_RepeatDigitSuffix_RepeatCommonCharSuffix_IsMatch()
+    public void TwoL33tEmailSubjectParts_RepeatDigitSuffix_TwoRepeatCommonCharSuffix_IsMatch()
     {
         string password = "s1ngul1nkmikem111!!";
 
@@ -58,16 +58,18 @@ public sealed class PasswordCheckerTests
         result.MatchedValues.ShouldBe(["password", "123", "123", "123", "123"]);
     }
 
-    public void Subject_TwoKeyboardSequences_IsMatch()
+    [TestMethod]
+    public void Subject_KeyboardSequence_ShiftedKeyboardSequence_IsMatch()
     {
-        string password = "password123UIOP{}|";
+        string password = "password123IOP{}|";
 
         var result = PasswordChecker.Default.CheckPassword(password);
 
         result.Matched.ShouldBeTrue();
-        result.MatchedValues.ShouldBe(["password", "123", "uiop{}"]);
+        result.MatchedValues.ShouldBe(["password", "123", "IOP{}|"]);
     }
 
+    [TestMethod]
     public void RepeatSubject_IsMatch()
     {
         string password = "PasswordPassword-PasswordPassword";
@@ -126,9 +128,9 @@ public sealed class PasswordCheckerTests
     }
 
     [TestMethod]
-    public void SuffixedVerb_RepeatedWebsiteSubject_RepeatedNameSubject_CommonSuffix_IsMatch()
+    public void SuffixedVerb_RepeatedWebsiteSubject_RepeatedNameSubject_ReverseKeyboardSequence_IsMatch()
     {
-        string password = "LogInToSingulinkSingulinkMikeMike1!";
+        string password = "LogInToSingulinkSingulinkMikeMike hgfds";
 
         var result = PasswordChecker.Default.CheckPassword(password, [
             new(ContextualSubjectType.Website, "https://www.singulink.com"),
@@ -136,7 +138,7 @@ public sealed class PasswordCheckerTests
         ]);
 
         result.Matched.ShouldBeTrue();
-        result.MatchedValues.ShouldBe(["login", "to", "singulink", "singulink", "mike", "mike", "1", "!"]);
+        result.MatchedValues.ShouldBe(["login", "to", "singulink", "singulink", "mike", "mike", "HGFDS"]);
     }
 
     [TestMethod]
@@ -203,6 +205,68 @@ public sealed class PasswordCheckerTests
 
         result.Matched.ShouldBeTrue();
         result.MatchedValues.ShouldBe(["let", "me", "into", "admin"]);
+    }
+
+    [TestMethod]
+    public void Adjective_Subject_IsMatch()
+    {
+        string password = "coolninja";
+
+        var result = PasswordChecker.Default.CheckPassword(password);
+
+        result.Matched.ShouldBeTrue();
+        result.MatchedValues.ShouldBe(["cool", "ninja"]);
+    }
+
+    [TestMethod]
+    public void SuffixedAdjective_Subject_IsMatch()
+    {
+        string password = "coolasninja";
+
+        var result = PasswordChecker.Default.CheckPassword(password);
+
+        result.Matched.ShouldBeTrue();
+        result.MatchedValues.ShouldBe(["cool", "as", "ninja"]);
+    }
+
+    [TestMethod]
+    public void AdjectiveWithSuffix_PrefixedSubject_IsMatch()
+    {
+        string password = "coolasaninja";
+
+        var result = PasswordChecker.Default.CheckPassword(password);
+
+        result.Matched.ShouldBeTrue();
+        result.MatchedValues.ShouldBe(["cool", "as", "a", "ninja"]);
+    }
+
+    [TestMethod]
+    public void Subject_CopularVerb_AdjectiveWithSuffix_PrefixedSubject_IsMatch()
+    {
+        string password = "iamcoolasaninja";
+
+        var result = PasswordChecker.Default.CheckPassword(password);
+
+        result.Matched.ShouldBeTrue();
+        result.MatchedValues.ShouldBe(["i", "am", "cool", "as", "a", "ninja"]);
+    }
+
+    [TestMethod]
+    public void FourKeyboardSequences_Subject_IsMatch()
+    {
+        string password = @"1234567asdfghbnm,fghjkl;'admin";
+
+        var result = PasswordChecker.Default.CheckPassword(password);
+        result.Matched.ShouldBeTrue();
+    }
+
+    [TestMethod]
+    public void LongPassword_IsMatch()
+    {
+        string password = @"1234567890-=qwertyuiop[]\asdfghjkl;'zxcvbnm,./memememe1234567890";
+
+        var result = PasswordChecker.Default.CheckPassword(password);
+        result.Matched.ShouldBeTrue();
     }
 
     [TestMethod]

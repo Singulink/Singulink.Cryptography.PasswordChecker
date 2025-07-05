@@ -6,7 +6,7 @@
 [![View nuget packages](https://img.shields.io/nuget/v/Singulink.Cryptography.PasswordChecker.svg)](https://www.nuget.org/packages/Singulink.Cryptography.PasswordChecker/)
 [![Build and Test](https://github.com/Singulink/Singulink.Cryptography.PasswordChecker/workflows/build%20and%20test/badge.svg)](https://github.com/Singulink/Singulink.Cryptography.PasswordChecker/actions?query=workflow%3A%22build+and+test%22)
 
-**Singulink.Cryptography.PasswordChecker** uses algorithms similar to a dictionary attack password generator but in reverse - instead of generating passwords, it using matching rules to check if the password follows a predictable pattern with commonly used and contextual password words. This makes it easy to detect passwords that are vulnerable to simple dictionary attacks and follow the latest NIST password guidelines, giving your users lots of flexibility when choosing their passwords while still protecting them (without having to generate and maintain an actual password dictionary).
+**Password Checker** uses algorithms similar to dictionary attack password generators but in reverse - instead of generating passwords, it uses a matching rule system to check if the password follows a common password pattern with the most commonly used password words/phrases that dictionary attacks use to generate passwords, taking into account contextual information like your app/service name and the user's information (name, email address, etc). This makes it easy to detect passwords that are vulnerable to simple dictionary attacks and follow the latest [NIST password guidelines](https://pages.nist.gov/800-63-4/sp800-63b/passwords/), giving your users lots of flexibility when choosing their passwords while still protecting them, without having to maintain specialized password dictionaries.
 
 ### About Singulink
 
@@ -31,11 +31,13 @@ End-of-life runtime versions that are no longer officially supported are not tes
 
 ## Usage
 
-More information is coming soon, but for now you can have a [look at the tests](https://github.com/Singulink/Singulink.Cryptography.PasswordChecker/blob/main/Tests/Singulink.Cryptography.PasswordChecker.Tests/PasswordCheckerTests.cs) to get an idea of how it works.
+**Password Checker** is inteded to be used together with something like the [Have I Been Pwned](https://haveibeenpwned.com/) password database to disallow the use of top leaked passwords (or all leaked passwords) and rate-limiting (as per [NIST guidelines](https://pages.nist.gov/800-63-4/sp800-63b/authenticators/#throttle)) to get comprehensive dictionary attack protection. See [our Pwned client/server implementation](https://github.com/Singulink/Singulink.Cryptography.Pwned) if you would like to self-host a pwned password lookup service internally.
+
+More documentation is coming soon, but for now you can have a [look at the tests](https://github.com/Singulink/Singulink.Cryptography.PasswordChecker/blob/main/Tests/Singulink.Cryptography.PasswordChecker.Tests/PasswordCheckerTests.cs) to get an idea of how checking passwords works.
 
 The default [`PasswordMatchersProvider`](https://github.com/Singulink/Singulink.Cryptography.PasswordChecker/blob/main/Source/Singulink.Cryptography.PasswordChecker/PasswordMatchersProvider.cs) implementation returns a set of matchers that cover the most easily dictionary attacked password patterns using curated common password data in [`CommonMatchers`](https://github.com/Singulink/Singulink.Cryptography.PasswordChecker/blob/main/Source/Singulink.Cryptography.PasswordChecker/PasswordMatchers/CommonMatchers.cs) and contextual subjects you provide (i.e. the name of your service, the user's name / email address / etc). It matches with the top ~100 most common password words used in an easily predictable order.
 
-If the password checker returns a match, you should display a message to the user something along the lines of `"Password matches our dictionary of contextual or top 100 common word variations in a predictable order. Please add a word or two (uncommon words are better) to your password to make it less predictable and succeptible to attacks"`. You can optionally display the list of matched words to the user so they can see the basic phrase their variation matched to.
+If the check returns a match, you should display a message to the user something along the lines of `"Password matches our dictionary of contextual and top 100 common word variations in a predictable order. Please add a word or two (uncommon words preferred) to your password to make it less predictable and succeptible to attacks"`. You can optionally display the list of matched texts to the user so they can see the simplified version of the text their password variation matched to.
 
 The library is written to be extensible, so you can easily add your own matchers or override the default ones if you want to customize the behavior.
 

@@ -39,7 +39,7 @@ public abstract class ValueMatcher : PasswordMatcher
                         matchRepeats: true,
                         matchTrailingSeparator: MatchTrailingSeparator);
 
-                    foreach (var repeatContext in repeatMatcher.GetValueMatches(childContext))
+                    foreach (var repeatContext in repeatMatcher.GetMatches(childContext))
                         yield return repeatContext;
                 }
             }

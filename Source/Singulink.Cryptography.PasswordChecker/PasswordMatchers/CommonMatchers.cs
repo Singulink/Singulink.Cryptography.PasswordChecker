@@ -17,8 +17,8 @@ public static class CommonMatchers
         Segment("worst"),
         Segment("good"),
         Segment("bad"),
-        Segment("cool"),
         Segment("coolest"),
+        Segment("cool"),
         Segment("great"),
         Segment("awesome"),
         Segment("amazing"),
@@ -27,6 +27,12 @@ public static class CommonMatchers
         Segment("cute"),
         Segment("sexy"),
         Segment("hot"),
+    ]);
+
+    public static PasswordMatcher AdjectiveToSubjectConjunctionMatcher { get; } = Any([
+        Segment("as"),
+        Segment("with"),
+        Segment("like"),
     ]);
 
     public static PasswordMatcher SubjectToAdjectiveDeterminerMatcher { get; } = Any([
@@ -42,18 +48,18 @@ public static class CommonMatchers
     ]);
 
     public static PasswordMatcher SubjectToAdjectiveCopularVerbMatcher { get; } = Any([
-        Sequence([Segment("is"), OptionalSegment("not"), Optional(SubjectToAdjectiveModifierMatcher), Optional(SubjectToAdjectiveDeterminerMatcher)]),
-        Sequence([Segment("are"), OptionalSegment("not"), Optional(SubjectToAdjectiveModifierMatcher), Optional(SubjectToAdjectiveDeterminerMatcher)]),
-        Sequence([Segment("am"), OptionalSegment("not"), Optional(SubjectToAdjectiveModifierMatcher), Optional(SubjectToAdjectiveDeterminerMatcher)]),
+        Sequence([Segment("is"), Optional(Segment("not")), Optional(SubjectToAdjectiveModifierMatcher), Optional(SubjectToAdjectiveDeterminerMatcher)]),
+        Sequence([Segment("are"), Optional(Segment("not")), Optional(SubjectToAdjectiveModifierMatcher), Optional(SubjectToAdjectiveDeterminerMatcher)]),
+        Sequence([Segment("am"), Optional(Segment("not")), Optional(SubjectToAdjectiveModifierMatcher), Optional(SubjectToAdjectiveDeterminerMatcher)]),
     ]);
 
     public static PasswordMatcher SubjectToSubjectCopularVerbMatcher { get; } = Any([
-        Sequence([Segment("is"), OptionalSegment("not")]),
-        Sequence([Segment("are"), OptionalSegment("not")]),
-        Sequence([Segment("am"), OptionalSegment("not")]),
+        Sequence([Segment("is"), Optional(Segment("not"))]),
+        Sequence([Segment("are"), Optional(Segment("not"))]),
+        Sequence([Segment("am"), Optional(Segment("not"))]),
     ]);
 
-    public static PasswordMatcher ConjunctionMatcher { get; } = Any([
+    public static PasswordMatcher SubjectConjunctionMatcher { get; } = Any([
         Segment("and"),
         Segment("or"),
         Segment("to"),
@@ -97,7 +103,8 @@ public static class CommonMatchers
         Segment("us"),
 
         Segment("password"),
-        SegmentSequence(["pass", "word?"], parseOptionalSegments: true),
+        SegmentSequence(["pass", "word"]),
+        Segment("pass"),
         Segment("login"),
         SegmentSequence(["log", "in"]),
         Segment("secret"),
@@ -120,18 +127,18 @@ public static class CommonMatchers
         Segment("hockey"),
         Segment("soccer"),
 
-        Segment("noob"),
         Segment("noobs"),
+        Segment("noob"),
         Segment("google"),
-        Segment("monkey"),
         Segment("monkeys"),
-        Segment("dragon"),
+        Segment("monkey"),
         Segment("dragons"),
-        Segment("ninja"),
+        Segment("dragon"),
         Segment("ninjas"),
+        Segment("ninja"),
         Segment("batman"),
-        Segment("hottie"),
         Segment("hotties"),
+        Segment("hottie"),
         Segment("shadow"),
         Segment("sunshine"),
         Segment("princess"),
@@ -141,6 +148,8 @@ public static class CommonMatchers
         Segment("whatever"),
         Segment("love"),
         Segment("sex"),
+        Segment("fuck"),
+        Segment("shit"),
         SegmentPermutations(["donald", "trump"]),
         SegmentPermutations(["joe", "biden"]),
         Segment("starwars"),
@@ -151,17 +160,17 @@ public static class CommonMatchers
     ]);
 
     public static PasswordMatcher VerbMatcher { get; } = Any([
-        Segment("love"),
         Segment("loves"),
-        Segment("like"),
+        Segment("love"),
         Segment("likes"),
-        Segment("hate"),
+        Segment("like"),
         Segment("hates"),
+        Segment("hate"),
         Segment("am"),
-        Segment("want"),
         Segment("wants"),
-        Segment("trust"),
+        Segment("want"),
         Segment("trusts"),
+        Segment("trust"),
 
         Segment("login"),
         SegmentSequence(["log", "in"]),
@@ -173,19 +182,27 @@ public static class CommonMatchers
 
     public static readonly PasswordMatcher PasswordPrefixMatcher = Permutations([
         YearMatcher,
-        KeyboardSequence(KeyboardSequenceTypes.Row),
-        KeyboardSequence(KeyboardSequenceTypes.Row),
-        KeyboardSequence(KeyboardSequenceTypes.Row),
-        KeyboardSequence(KeyboardSequenceTypes.Row),
+        Sequence([
+            KeyboardSequence(KeyboardSequenceTypes.Row),
+            Optional(KeyboardSequence(KeyboardSequenceTypes.Row)),
+        ]),
+        Sequence([
+            KeyboardSequence(KeyboardSequenceTypes.Row),
+            Optional(KeyboardSequence(KeyboardSequenceTypes.Row)),
+        ]),
     ]);
 
     public static readonly PasswordMatcher PasswordSuffixMatcher = Permutations([
         YearMatcher,
-        KeyboardSequence(KeyboardSequenceTypes.Row),
-        KeyboardSequence(KeyboardSequenceTypes.Row),
-        KeyboardSequence(KeyboardSequenceTypes.Row),
-        KeyboardSequence(KeyboardSequenceTypes.Row),
-        RepeatedChars(1, 10, c => c is '!' or '$' or '?'),
-        RepeatedChars(1, 10, c => c is >= '0' and <= '9'),
+        Sequence([
+            KeyboardSequence(KeyboardSequenceTypes.Row),
+            Optional(KeyboardSequence(KeyboardSequenceTypes.Row)),
+        ]),
+        Sequence([
+            KeyboardSequence(KeyboardSequenceTypes.Row),
+            Optional(KeyboardSequence(KeyboardSequenceTypes.Row)),
+        ]),
+        RepeatedChars(1, 16, c => c is '!' or '$' or '?'),
+        RepeatedChars(1, 16, c => c is >= '0' and <= '9'),
     ]);
 }

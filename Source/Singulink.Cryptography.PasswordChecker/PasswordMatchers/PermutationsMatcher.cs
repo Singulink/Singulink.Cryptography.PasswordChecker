@@ -24,8 +24,8 @@ public class PermutationsMatcher : PasswordMatcher
     protected internal override IEnumerable<PasswordMatchContext> GetMatches(PasswordMatchContext context)
     {
         return MustMatchAllMatchers
-            ? GetMatchesAll(context, [])
-            : GetMatchesAny(context, []);
+            ? GetMatchesAll(context, []).Distinct()
+            : GetMatchesAny(context, []).Distinct();
     }
 
     private IEnumerable<PasswordMatchContext> GetMatchesAny(PasswordMatchContext context, PasswordMatcher[] usedMatchers)
