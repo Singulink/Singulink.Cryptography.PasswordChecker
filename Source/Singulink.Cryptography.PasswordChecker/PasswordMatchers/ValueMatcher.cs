@@ -2,7 +2,7 @@ namespace Singulink.Cryptography.PasswordMatchers;
 
 public abstract class ValueMatcher : PasswordMatcher
 {
-    private static readonly ImmutableArray<char> Separators = [' ', '-', '_', '.'];
+    private static readonly ImmutableArray<char> Separators = [' ', '.'];
 
     public bool MatchTrailingSeparator { get; }
 

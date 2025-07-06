@@ -150,8 +150,8 @@ public static class CommonMatchers
         Segment("sex"),
         Segment("fuck"),
         Segment("shit"),
-        SegmentPermutations(["donald", "trump"]),
-        SegmentPermutations(["joe", "biden"]),
+        SegmentSequence(["donald", "trump?"], parseOptionalSegments: true),
+        SegmentSequence(["joe", "biden?"], parseOptionalSegments: true),
         Segment("starwars"),
         SegmentSequence(["star", "wars"]),
 
@@ -202,7 +202,10 @@ public static class CommonMatchers
             KeyboardSequence(KeyboardSequenceTypes.Row),
             Optional(KeyboardSequence(KeyboardSequenceTypes.Row)),
         ]),
+        Sequence([
+            RepeatedChars(1, 16, c => c is >= '0' and <= '9'),
+            RepeatedChars(1, 16, c => c is >= '0' and <= '9'),
+        ]),
         RepeatedChars(1, 16, c => c is '!' or '$' or '?'),
-        RepeatedChars(1, 16, c => c is >= '0' and <= '9'),
     ]);
 }

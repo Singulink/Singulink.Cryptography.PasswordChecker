@@ -30,7 +30,7 @@ public sealed class PasswordCheckerTests
     {
         string password = "s1ngul1nkisthebest";
 
-        var result = PasswordChecker.Default.CheckPassword(password, [new(ContextualSubjectType.Company, "Singulink Business Solutions")]);
+        var result = PasswordChecker.Default.CheckPassword(password, [new("Singulink Business Solutions", ContextualSubjectType.Company)]);
 
         result.Matched.ShouldBeTrue();
         result.MatchedValues.ShouldBe(["singulink", "is", "the", "best"]);
@@ -41,7 +41,7 @@ public sealed class PasswordCheckerTests
     {
         string password = "s1ngul1nkmikem111!!";
 
-        var result = PasswordChecker.Default.CheckPassword(password, [new(ContextualSubjectType.Email, "mikem@singulink.com")]);
+        var result = PasswordChecker.Default.CheckPassword(password, [new("mikem@singulink.com", ContextualSubjectType.Email)]);
 
         result.Matched.ShouldBeTrue();
         result.MatchedValues.ShouldBe(["singulink", "mikem", "111", "!!"]);
@@ -72,7 +72,7 @@ public sealed class PasswordCheckerTests
     [TestMethod]
     public void RepeatSubject_IsMatch()
     {
-        string password = "PasswordPassword-PasswordPassword";
+        string password = "PasswordPassword PasswordPassword";
 
         var result = PasswordChecker.Default.CheckPassword(password);
 
@@ -94,7 +94,7 @@ public sealed class PasswordCheckerTests
     [TestMethod]
     public void PrefixedAdjective_Subject_WithDifferentSeparators_IsMatch()
     {
-        string password = "the_bad-admin";
+        string password = "the.bad.admin";
 
         var result = PasswordChecker.Default.CheckPassword(password);
 
@@ -119,8 +119,8 @@ public sealed class PasswordCheckerTests
         string password = "MikeMikeLogInToSingulinkSingulink1!";
 
         var result = PasswordChecker.Default.CheckPassword(password, [
-            new(ContextualSubjectType.Website, "https://www.singulink.com"),
-            new(ContextualSubjectType.Name, "Mike Smith")
+            new("https://www.singulink.com", ContextualSubjectType.Website),
+            new("Mike Smith", ContextualSubjectType.Name)
         ]);
 
         result.Matched.ShouldBeTrue();
@@ -133,8 +133,8 @@ public sealed class PasswordCheckerTests
         string password = "LogInToSingulinkSingulinkMikeMike hgfds";
 
         var result = PasswordChecker.Default.CheckPassword(password, [
-            new(ContextualSubjectType.Website, "https://www.singulink.com"),
-            new(ContextualSubjectType.Name, "Mike Smith")
+            new("https://www.singulink.com", ContextualSubjectType.Website),
+            new("Mike Smith", ContextualSubjectType.Name)
         ]);
 
         result.Matched.ShouldBeTrue();

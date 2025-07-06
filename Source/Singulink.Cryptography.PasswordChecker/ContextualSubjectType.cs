@@ -2,7 +2,7 @@ namespace Singulink.Cryptography;
 
 public enum ContextualSubjectType
 {
-    None,
+    General,
     Name,
     Email,
     Username,

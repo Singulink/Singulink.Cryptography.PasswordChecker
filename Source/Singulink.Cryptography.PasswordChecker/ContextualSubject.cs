@@ -1,3 +1,5 @@
+using Singulink.Enums;
+
 namespace Singulink.Cryptography;
 
 public class ContextualSubject
@@ -6,9 +8,12 @@ public class ContextualSubject
 
     public string Value { get; }
 
-    public ContextualSubject(ContextualSubjectType type, string? value)
+    public ContextualSubject(string value, ContextualSubjectType type = ContextualSubjectType.General)
     {
-        Type = type;
+        if (!type.IsDefined())
+            throw new ArgumentOutOfRangeException(nameof(type), "Invalid contextual subject type.");
+
         Value = value?.Trim() ?? string.Empty;
+        Type = type;
     }
 }
