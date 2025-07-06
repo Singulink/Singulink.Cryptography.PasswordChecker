@@ -14,7 +14,7 @@ public class PasswordMatchersProvider : IPasswordMatchersProvider
         _subjectMatcherProvider = subjectMatcherProvider;
     }
 
-    public virtual IEnumerable<PasswordMatcher> GetMatchers(IEnumerable<ContextualSubject>? subjects = null)
+    public virtual IEnumerable<PasswordMatcher> GetMatchers(IEnumerable<ContextualSubject>? subjects)
     {
         // Subject matchers
 

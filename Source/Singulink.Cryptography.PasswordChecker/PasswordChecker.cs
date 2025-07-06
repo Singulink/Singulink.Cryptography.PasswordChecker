@@ -11,7 +11,7 @@ public class PasswordChecker : IPasswordChecker
         _matchersProvider = matchersProvider;
     }
 
-    public virtual PasswordCheckResult CheckPassword(string password, IEnumerable<ContextualSubject>? subjects = null)
+    public virtual PasswordCheckResult CheckPassword(string password, IEnumerable<ContextualSubject>? subjects)
     {
         return GetResult(password, _matchersProvider.GetMatchers(subjects));
     }
