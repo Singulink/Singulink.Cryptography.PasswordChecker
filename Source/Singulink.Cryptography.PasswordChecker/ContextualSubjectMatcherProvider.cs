@@ -83,9 +83,9 @@ public class ContextualSubjectMatcherProvider : IContextualSubjectMatcherProvide
                 return null;
 
             if (values.Length is 1)
-                return PasswordMatcher.Segment(value);
+                return PasswordMatcher.Text(value, PasswordMatchType.ContextualSubject);
 
-            return PasswordMatcher.Permutations(values.Select(v => PasswordMatcher.Segment(v)));
+            return PasswordMatcher.Permutations(values.Select(v => PasswordMatcher.Text(v, PasswordMatchType.ContextualSubject)));
         }
     }
 }

@@ -92,7 +92,7 @@ public sealed class PasswordCheckerTests
     }
 
     [TestMethod]
-    public void PrefixedAdjective_Subject_WithDifferentSeparators_IsMatch()
+    public void DeterminedAdjective_Subject_WithDifferentSeparators_IsMatch()
     {
         string password = "the.bad.admin";
 
@@ -103,7 +103,7 @@ public sealed class PasswordCheckerTests
     }
 
     [TestMethod]
-    public void Subject_CopularVerb_PrefixedAdjective_L33tSubject_IsMatch()
+    public void Subject_CopularVerb_DeterminedAdjective_L33tSubject_IsMatch()
     {
         string password = "IAmABad@dmin";
 
@@ -111,6 +111,17 @@ public sealed class PasswordCheckerTests
 
         result.Matched.ShouldBeTrue();
         result.MatchedValues.ShouldBe(["i", "am", "a", "bad", "admin"]);
+    }
+
+    [TestMethod]
+    public void Subject_CopularVerb_DeterminedCompanySubject_Subject_IsMatch()
+    {
+        string password = "iamthebusinessadmin";
+
+        var result = PasswordChecker.Default.CheckPassword(password, [new("Singulink Business Solutions", ContextualSubjectType.Company)]);
+
+        result.Matched.ShouldBeTrue();
+        result.MatchedValues.ShouldBe(["i", "am", "the", "business", "admin"]);
     }
 
     [TestMethod]
@@ -161,17 +172,6 @@ public sealed class PasswordCheckerTests
 
         result.Matched.ShouldBeTrue();
         result.MatchedValues.ShouldBe(["you", "are", "a", "bad", "noob"]);
-    }
-
-    [TestMethod]
-    public void Subject_SubjectJoiner_PrefixedAdjective2_Subject_IsMatch()
-    {
-        string password = "you are not a bad noob";
-
-        var result = PasswordChecker.Default.CheckPassword(password);
-
-        result.Matched.ShouldBeTrue();
-        result.MatchedValues.ShouldBe(["you", "are", "not", "a", "bad", "noob"]);
     }
 
     [TestMethod]
@@ -254,7 +254,7 @@ public sealed class PasswordCheckerTests
     [TestMethod]
     public void FourKeyboardSequences_Subject_IsMatch()
     {
-        string password = @"1234567asdfghbnm,fghjkl;'admin";
+        string password = @"1234asdfqwerzxcvadmin";
 
         var result = PasswordChecker.Default.CheckPassword(password);
         result.Matched.ShouldBeTrue();

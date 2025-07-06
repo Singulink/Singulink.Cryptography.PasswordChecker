@@ -29,8 +29,8 @@ public abstract class PasswordMatcher
 
             for (var c = context; c.ParentContext is not null; c = c.ParentContext)
             {
-                if (c.LastMatchedText is not null)
-                    items.Add(new() { MatchedText = c.LastMatchedText });
+                if (c.LastMatchItem is not null)
+                    items.Add(c.LastMatchItem);
             }
 
             items.Reverse();
@@ -44,14 +44,14 @@ public abstract class PasswordMatcher
         return new AnyMatcher(matchers);
     }
 
-    public static PasswordMatcher FixedDigits(int numDigits, bool matchRepeats = true, bool matchTrailingSeparator = true)
+    public static PasswordMatcher FixedDigits(int numDigits, PasswordMatchType matchType, bool matchRepeats = true, bool matchTrailingSeparator = true)
     {
-        return new FixedDigitsMatcher(numDigits, minValue: 0, maxValue: (int)Math.Pow(10, numDigits) - 1, matchRepeats, matchTrailingSeparator);
+        return new FixedDigitsMatcher(numDigits, minValue: 0, maxValue: (int)Math.Pow(10, numDigits) - 1, matchType, matchRepeats, matchTrailingSeparator);
     }
 
-    public static PasswordMatcher FixedDigits(int numDigits, int minValue, int maxValue, bool matchRepeats = true, bool matchTrailingSeparator = true)
+    public static PasswordMatcher FixedDigits(int numDigits, int minValue, int maxValue, PasswordMatchType matchType, bool matchRepeats = true, bool matchTrailingSeparator = true)
     {
-        return new FixedDigitsMatcher(numDigits, minValue, maxValue, matchRepeats, matchTrailingSeparator);
+        return new FixedDigitsMatcher(numDigits, minValue, maxValue, matchType, matchRepeats, matchTrailingSeparator);
     }
 
     public static PasswordMatcher KeyboardSequence(KeyboardSequenceTypes sequenceTypes, bool matchTrailingSeparator = true)
@@ -69,32 +69,19 @@ public abstract class PasswordMatcher
         return new PermutationsMatcher(matchers, mustMatchAllMatchers);
     }
 
-    public static PasswordMatcher RepeatedChars(Func<char, bool>? charFilter = null, bool matchTrailingSeparator = true)
+    public static PasswordMatcher RepeatedChars(Func<char, bool>? charFilter, bool matchTrailingSeparator = true)
     {
         return new RepeatedCharMatcher(1, int.MaxValue, charFilter, matchTrailingSeparator);
     }
 
-    public static PasswordMatcher RepeatedChars(int minCount, int maxCount, Func<char, bool>? charFilter = null, bool matchTrailingSeparator = true)
+    public static PasswordMatcher RepeatedChars(int minCount, int maxCount, Func<char, bool>? charFilter, bool matchTrailingSeparator = true)
     {
         return new RepeatedCharMatcher(minCount, maxCount, charFilter, matchTrailingSeparator);
     }
 
-    public static PasswordMatcher Segment(string segment, bool checkSubstitutions = true, bool matchRepeats = true, bool matchTrailingSeparator = true)
+    public static PasswordMatcher Text(string text, PasswordMatchType matchType = PasswordMatchType.Common, bool checkSubstitutions = true, bool matchRepeats = true, bool matchTrailingSeparator = true)
     {
-        return new SegmentMatcher(segment, checkSubstitutions, matchRepeats, matchTrailingSeparator);
-    }
-
-    public static PasswordMatcher SegmentSequence(IEnumerable<string> segments, bool parseOptionalSegments = false, bool checkSubstitutions = true, bool matchTrailingSeparators = true)
-    {
-        return new SequenceMatcher(
-            segments.Select(s => parseOptionalSegments && s is [.., '?'] ?
-                Optional(Segment(s[..^1], checkSubstitutions, matchTrailingSeparators)) :
-                Segment(s, checkSubstitutions, matchTrailingSeparators)));
-    }
-
-    public static PasswordMatcher SegmentPermutations(IEnumerable<string> segments, bool checkSubstitutions = true, bool matchTrailingSeparators = true, bool mustMatchAllMatchers = false)
-    {
-        return new PermutationsMatcher(segments.Select(s => Segment(s, checkSubstitutions, matchTrailingSeparators)), mustMatchAllMatchers);
+        return new TextMatcher(text, matchType, checkSubstitutions, matchRepeats, matchTrailingSeparator);
     }
 
     public static PasswordMatcher Sequence(IEnumerable<PasswordMatcher> matchers)

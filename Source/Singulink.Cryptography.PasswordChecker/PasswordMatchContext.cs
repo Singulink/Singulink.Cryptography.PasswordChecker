@@ -11,7 +11,7 @@ public sealed record PasswordMatchContext
     /// <summary>
     /// Gets the last text that matched to the password (without separators).
     /// </summary>
-    public string? LastMatchedText { get; private init; }
+    public PasswordMatchItem? LastMatchItem { get; private init; }
 
     /// <summary>
     /// Gets the total length of characters matched against <see cref="CheckedPassword"/> so far.
@@ -24,9 +24,19 @@ public sealed record PasswordMatchContext
     {
         OriginalPassword = password;
         CheckedPassword = OriginalPassword.Trim().ToLowerInvariant();
+
+        while (true)
+        {
+            string normalizedSpaces = CheckedPassword.Replace("  ", " ");
+
+            if (normalizedSpaces == CheckedPassword)
+                break;
+
+            CheckedPassword = normalizedSpaces;
+        }
     }
 
-    public PasswordMatchContext CreateChild(int length, string? matchedText = null)
+    public PasswordMatchContext CreateChild(PasswordMatcher matcher, int length, PasswordMatchItem? matchItem)
     {
         if (length < 0)
             throw new ArgumentOutOfRangeException(nameof(length), "Length must be non-negative.");
@@ -37,7 +47,7 @@ public sealed record PasswordMatchContext
             throw new ArgumentOutOfRangeException(nameof(length), "Length exceeds the original password length.");
 
         return this with {
-            LastMatchedText = matchedText,
+            LastMatchItem = matchItem,
             TotalMatchedLength = TotalMatchedLength + length,
             ParentContext = this,
         };
@@ -52,15 +62,15 @@ public sealed record PasswordMatchContext
             return false;
 
         return OriginalPassword == other.OriginalPassword &&
-               LastMatchedText == other.LastMatchedText &&
+               LastMatchItem == other.LastMatchItem &&
                TotalMatchedLength == other.TotalMatchedLength &&
                ParentContext == other.ParentContext;
     }
 
-    public override int GetHashCode() => HashCode.Combine(OriginalPassword, LastMatchedText, TotalMatchedLength, ParentContext);
+    public override int GetHashCode() => HashCode.Combine(OriginalPassword, LastMatchItem, TotalMatchedLength, ParentContext);
 
     public override string ToString()
     {
-        return $@"Remaining: ""{RemainingChars.ToString()}""({RemainingChars.Length} chars), LastMatched: ""{LastMatchedText}"", TotalMatched: {TotalMatchedLength}";
+        return $@"Remaining: ""{RemainingChars.ToString()}""({RemainingChars.Length} chars), LastMatched: {LastMatchItem}, TotalMatched: {TotalMatchedLength}";
     }
 }

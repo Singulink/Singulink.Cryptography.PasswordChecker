@@ -37,7 +37,7 @@ public class RepeatedCharMatcher : ValueMatcher
         int count = 1;
 
         if (MinCount is 1)
-            yield return context.CreateChild(1, c.ToString());
+            yield return context.CreateChild(this, 1, new PasswordMatchItem(c.ToString(), PasswordMatchType.RepeatedChar));
 
         for (int i = 1; i < context.RemainingChars.Length && count < MaxCount; i++)
         {
@@ -46,7 +46,10 @@ public class RepeatedCharMatcher : ValueMatcher
                 count++;
 
                 if (count >= MinCount)
-                    yield return context.CreateChild(i + 1, context.RemainingChars[..(i + 1)].ToString());
+                {
+                    var matchItem = new PasswordMatchItem(context.RemainingChars[..(i + 1)].ToString(), PasswordMatchType.RepeatedChar);
+                    yield return context.CreateChild(this, i + 1, matchItem);
+                }
             }
             else
             {

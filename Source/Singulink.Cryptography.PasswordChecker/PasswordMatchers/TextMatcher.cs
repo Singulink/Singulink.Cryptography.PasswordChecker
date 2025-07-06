@@ -1,6 +1,8 @@
+using Singulink.Cryptography.Utilities;
+
 namespace Singulink.Cryptography.PasswordMatchers;
 
-public class SegmentMatcher : ValueMatcher
+public class TextMatcher : ValueMatcher
 {
     private static readonly FrozenDictionary<char, ImmutableArray<char>> CharacterSubstitutions = new Dictionary<char, ImmutableArray<char>>() {
                 { 'a', ['4', '@', 'Д'] },
@@ -23,38 +25,43 @@ public class SegmentMatcher : ValueMatcher
                 { 'z', ['2', '%'] },
             }.ToFrozenDictionary();
 
-    public new string Segment { get; }
+    public new string Text { get; }
 
     public bool CheckSubstitutions { get; }
 
-    public SegmentMatcher(string segment, bool checkSubstitutions, bool matchRepeats, bool matchTrailingSeparator)
+    public PasswordMatchType MatchType { get; }
+
+    public TextMatcher(string text, PasswordMatchType matchType, bool checkSubstitutions, bool matchRepeats, bool matchTrailingSeparator)
         : base(matchRepeats, matchTrailingSeparator)
     {
-        segment = segment.Trim().ToLowerInvariant();
+        text = text.Trim().ToLowerInvariant();
 
-        if (segment.Length is 0)
-            throw new ArgumentException("Segment cannot be empty.", nameof(segment));
+        if (text.Length is 0)
+            throw new ArgumentException("Segment cannot be empty.", nameof(text));
 
-        Segment = segment;
+        matchType.ThrowIfNotDefined(nameof(matchType));
+
+        Text = text;
         CheckSubstitutions = checkSubstitutions;
+        MatchType = matchType;
     }
 
     protected override IEnumerable<PasswordMatchContext> GetValueMatches(PasswordMatchContext context)
     {
         var p = context.RemainingChars;
 
-        if (p.Length < Segment.Length)
+        if (p.Length < Text.Length)
             return [];
 
-        for (int i = 0; i < Segment.Length; i++)
+        for (int i = 0; i < Text.Length; i++)
         {
-            if (p[i] != Segment[i])
+            if (p[i] != Text[i])
             {
-                if (!CheckSubstitutions || !CharacterSubstitutions.TryGetValue(Segment[i], out var substitutions) || !substitutions.Contains(p[i]))
+                if (!CheckSubstitutions || !CharacterSubstitutions.TryGetValue(Text[i], out var substitutions) || !substitutions.Contains(p[i]))
                     return [];
             }
         }
 
-        return [context.CreateChild(Segment.Length, Segment)];
+        return [context.CreateChild(this, Text.Length, new PasswordMatchItem(Text, MatchType))];
     }
 }

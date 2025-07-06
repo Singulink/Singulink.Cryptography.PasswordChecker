@@ -23,7 +23,7 @@ public abstract class ValueMatcher : PasswordMatcher
         {
             yield return childContext;
 
-            SegmentMatcher repeatMatcher = null;
+            RepeatValueMatcher repeatValueMatcher = null;
 
             if (MatchRepeats)
             {
@@ -32,26 +32,21 @@ public abstract class ValueMatcher : PasswordMatcher
                 if (repeatValueLength > 0)
                 {
                     string repeatValue = context.CheckedPassword.Substring(context.TotalMatchedLength, repeatValueLength);
+                    repeatValueMatcher = new(this, repeatValue, childContext.LastMatchItem?.MatchedText, MatchTrailingSeparator);
 
-                    repeatMatcher = new SegmentMatcher(
-                        segment: repeatValue,
-                        checkSubstitutions: false,
-                        matchRepeats: true,
-                        matchTrailingSeparator: MatchTrailingSeparator);
-
-                    foreach (var repeatContext in repeatMatcher.GetMatches(childContext))
+                    foreach (var repeatContext in repeatValueMatcher.GetMatches(childContext))
                         yield return repeatContext;
                 }
             }
 
             if (MatchTrailingSeparator && childContext.RemainingChars is [char s, ..] && Separators.Contains(s))
             {
-                var childContextWithSeparator = childContext.CreateChild(1, null);
+                var childContextWithSeparator = childContext.CreateChild(this, 1, null);
                 yield return childContextWithSeparator;
 
-                if (repeatMatcher is not null)
+                if (repeatValueMatcher is not null)
                 {
-                    foreach (var repeatContext in repeatMatcher.GetValueMatches(childContextWithSeparator))
+                    foreach (var repeatContext in repeatValueMatcher.GetValueMatches(childContextWithSeparator))
                         yield return repeatContext;
                 }
             }

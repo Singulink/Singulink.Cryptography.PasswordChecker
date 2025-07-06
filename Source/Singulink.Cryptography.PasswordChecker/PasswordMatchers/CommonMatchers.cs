@@ -8,177 +8,138 @@ namespace Singulink.Cryptography.PasswordMatchers;
 public static class CommonMatchers
 {
     /// <summary>
-    /// Gets a matcher that matches common years (1900-2099).
+    /// Gets a matcher that matches common years (1900 - current + 10).
     /// </summary>
-    public static PasswordMatcher YearMatcher { get; } = FixedDigits(4, 1900, 2099);
+    public static PasswordMatcher YearMatcher { get; } = FixedDigits(4, 1900, DateTime.Now.Year + 10, PasswordMatchType.Common);
 
     public static PasswordMatcher AdjectiveMatcher { get; } = Any([
-        Segment("best"),
-        Segment("worst"),
-        Segment("good"),
-        Segment("bad"),
-        Segment("coolest"),
-        Segment("cool"),
-        Segment("great"),
-        Segment("awesome"),
-        Segment("amazing"),
-        Segment("lovely"),
-        Segment("funny"),
-        Segment("cute"),
-        Segment("sexy"),
-        Segment("hot"),
+        Text("best"),
+        Text("worst"),
+        Text("good"),
+        Text("bad"),
+        Text("cool"),
+        Text("great"),
+        Text("awesome"),
+        Text("amazing"),
+        Text("lovely"),
+        Text("sexy"),
+        Text("hot"),
+        Text("trusted"),
     ]);
 
     public static PasswordMatcher AdjectiveToSubjectConjunctionMatcher { get; } = Any([
-        Segment("as"),
-        Segment("with"),
-        Segment("like"),
+        Text("like"),
+        Text("as"),
     ]);
 
     public static PasswordMatcher SubjectToAdjectiveDeterminerMatcher { get; } = Any([
-        Segment("the"),
-        Segment("a"),
-        Segment("an"),
+        Text("the"),
+        Text("a"),
+        Text("an"),
     ]);
 
-    public static PasswordMatcher SubjectToAdjectiveModifierMatcher { get; } = Any([
-        Segment("so"),
-        Segment("very"),
-        Segment("too"),
-    ]);
+    public static PasswordMatcher SubjectToAdjectiveModifierMatcher { get; } = Text("so");
 
     public static PasswordMatcher SubjectToAdjectiveCopularVerbMatcher { get; } = Any([
-        Sequence([Segment("is"), Optional(Segment("not")), Optional(SubjectToAdjectiveModifierMatcher), Optional(SubjectToAdjectiveDeterminerMatcher)]),
-        Sequence([Segment("are"), Optional(Segment("not")), Optional(SubjectToAdjectiveModifierMatcher), Optional(SubjectToAdjectiveDeterminerMatcher)]),
-        Sequence([Segment("am"), Optional(Segment("not")), Optional(SubjectToAdjectiveModifierMatcher), Optional(SubjectToAdjectiveDeterminerMatcher)]),
+        Sequence([Text("is"), Optional(SubjectToAdjectiveModifierMatcher), Optional(SubjectToAdjectiveDeterminerMatcher)]),
+        Sequence([Text("are"), Optional(SubjectToAdjectiveModifierMatcher), Optional(SubjectToAdjectiveDeterminerMatcher)]),
+        Sequence([Text("am"), Optional(SubjectToAdjectiveModifierMatcher), Optional(SubjectToAdjectiveDeterminerMatcher)]),
     ]);
 
     public static PasswordMatcher SubjectToSubjectCopularVerbMatcher { get; } = Any([
-        Sequence([Segment("is"), Optional(Segment("not"))]),
-        Sequence([Segment("are"), Optional(Segment("not"))]),
-        Sequence([Segment("am"), Optional(Segment("not"))]),
+        Text("is"),
+        Text("am"),
+        Text("are"),
     ]);
 
     public static PasswordMatcher SubjectConjunctionMatcher { get; } = Any([
-        Segment("and"),
-        Segment("or"),
-        Segment("to"),
-        Segment("in"),
-        Segment("into"),
-        SegmentSequence(["in", "to"]),
+        Text("and"),
+        Text("or"),
+        Text("to"),
+        Text("in"), // TODO: is this needed?
+        Text("into"),
+        Sequence([Text("in"), Text("to")]),
     ]);
 
     public static PasswordMatcher SubjectDeterminerMatcher { get; } = Any([
-        Segment("the"),
-        Segment("a"),
-        Segment("an"),
-        Segment("this"),
-        Segment("that"),
-        Segment("my"),
-        Segment("your"),
-        Segment("our"),
-        Segment("my"),
-        Segment("his"),
-        Segment("her"),
-        Segment("their"),
-        Segment("trusted"),
-        Segment("into"),
-        Segment("let"),
+        Text("the"),
+        Text("a"),
+        Text("an"),
+        Text("this"),
+        Text("my"),
+        Text("your"),
+        Text("their"),
+        Text("trusted"),
+        Text("into"),
+        Text("let"),
     ]);
 
     public static PasswordMatcher GeneralSubjectMatcher { get; } = Any([
-        YearMatcher,
-        Segment("i", checkSubstitutions: false),
-        Segment("me"),
-        Segment("it"),
-        Segment("you"),
-        Segment("this"),
-        Segment("he"),
-        Segment("she"),
-        Segment("they"),
-        Segment("we"),
-        Segment("him"),
-        Segment("her"),
-        Segment("them"),
-        Segment("us"),
+        Text("i", checkSubstitutions: false),
+        Text("me"),
+        Text("you"),
+        Text("this"),
 
-        Segment("password"),
-        SegmentSequence(["pass", "word"]),
-        Segment("pass"),
-        Segment("login"),
-        SegmentSequence(["log", "in"]),
-        Segment("secret"),
+        Text("password"),
+        Text("pass"),
+        Text("login"),
+        Text("secret"),
 
-        Segment("welcome"),
-        Segment("hello"),
-        Segment("hi"),
+        Text("welcome"),
+        Text("hello"),
+        Text("hi"),
 
-        Segment("master"),
-        Segment("admin"),
-        Segment("user"),
-        Segment("nobody"),
-        Segment("no1"),
-        SegmentSequence(["no", "1"]),
-        Segment("noone"),
-        SegmentSequence(["no", "one"]),
+        Text("master"),
+        Text("admin"),
+        Text("user"),
+        Text("nobody"),
+        Text("no1"),
 
-        Segment("football"),
-        Segment("baseball"),
-        Segment("hockey"),
-        Segment("soccer"),
+        Text("football"),
+        Text("baseball"),
+        Text("hockey"),
+        Text("soccer"),
 
-        Segment("noobs"),
-        Segment("noob"),
-        Segment("google"),
-        Segment("monkeys"),
-        Segment("monkey"),
-        Segment("dragons"),
-        Segment("dragon"),
-        Segment("ninjas"),
-        Segment("ninja"),
-        Segment("batman"),
-        Segment("hotties"),
-        Segment("hottie"),
-        Segment("shadow"),
-        Segment("sunshine"),
-        Segment("princess"),
-        Segment("freedom"),
-        Segment("jesus"),
-        Segment("god"),
-        Segment("whatever"),
-        Segment("love"),
-        Segment("sex"),
-        Segment("fuck"),
-        Segment("shit"),
-        SegmentSequence(["donald", "trump?"], parseOptionalSegments: true),
-        SegmentSequence(["joe", "biden?"], parseOptionalSegments: true),
-        Segment("starwars"),
-        SegmentSequence(["star", "wars"]),
+        Text("noob"),
+        Text("google"),
+        Text("monkey"),
+        Text("dragon"),
+        Text("ninja"),
+        Text("batman"),
+        Text("hottie"),
+        Text("shadow"),
+        Text("sunshine"),
+        Text("princess"),
+        Text("freedom"),
+        Text("jesus"),
+        Text("god"),
+        Text("whatever"),
+        Text("love"),
+        Text("sex"),
+        Text("fuck"),
+        Text("shit"),
+        Text("starwars"),
+        Sequence([Text("star"), Text("wars")]),
 
-        Segment("69", checkSubstitutions: false),
-        Segment("420", checkSubstitutions: false),
+        Text("69", checkSubstitutions: false),
+        Text("420", checkSubstitutions: false),
     ]);
 
     public static PasswordMatcher VerbMatcher { get; } = Any([
-        Segment("loves"),
-        Segment("love"),
-        Segment("likes"),
-        Segment("like"),
-        Segment("hates"),
-        Segment("hate"),
-        Segment("am"),
-        Segment("wants"),
-        Segment("want"),
-        Segment("trusts"),
-        Segment("trust"),
+        Text("love"),
+        Text("like"),
+        Text("hate"),
+        Text("am"),
+        Text("want"),
+        Text("trust"),
 
-        Segment("login"),
-        SegmentSequence(["log", "in"]),
+        Text("login"),
+        Text("log"),
 
-        Segment("let"),
+        Text("let"),
     ]);
 
-    public static PasswordMatcher VerbSuffixMatcher { get; } = Segment("to");
+    public static PasswordMatcher VerbSuffixMatcher { get; } = Text("to");
 
     public static readonly PasswordMatcher PasswordPrefixMatcher = Permutations([
         YearMatcher,
@@ -203,9 +164,9 @@ public static class CommonMatchers
             Optional(KeyboardSequence(KeyboardSequenceTypes.Row)),
         ]),
         Sequence([
-            RepeatedChars(1, 16, c => c is >= '0' and <= '9'),
-            RepeatedChars(1, 16, c => c is >= '0' and <= '9'),
+            RepeatedChars(1, 8, c => c is >= '0' and <= '9'),
+            Optional(RepeatedChars(1, 8, c => c is >= '0' and <= '9')),
         ]),
-        RepeatedChars(1, 16, c => c is '!' or '$' or '?'),
+        RepeatedChars(1, 8, c => c is '!' or '$' or '?'),
     ]);
 }

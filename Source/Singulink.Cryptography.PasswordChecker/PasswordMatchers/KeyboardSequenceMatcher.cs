@@ -34,7 +34,9 @@ public class KeyboardSequenceMatcher : ValueMatcher
                 {
                     if (context.RemainingChars.StartsWith(row.AsSpan(i, 3), StringComparison.Ordinal))
                     {
-                        var matchContext = context.CreateChild(3, row.Substring(i, 3).ToUpperInvariant());
+                        var matchItem = new PasswordMatchItem(row.Substring(i, 3).ToUpperInvariant(), PasswordMatchType.KeyboardSequence);
+                        var matchContext = context.CreateChild(this, 3, matchItem);
+
                         yield return matchContext;
 
                         // Check for each additional character match
@@ -45,7 +47,8 @@ public class KeyboardSequenceMatcher : ValueMatcher
                         {
                             if (matchContext.RemainingChars[0] == row[j])
                             {
-                                matchContext = context.CreateChild(currentChildMatchingLength++, matchContext.LastMatchedText + char.ToUpperInvariant(row[j]));
+                                matchItem = new PasswordMatchItem(matchItem.MatchedText + char.ToUpperInvariant(row[j]), PasswordMatchType.KeyboardSequence);
+                                matchContext = context.CreateChild(this, currentChildMatchingLength++, matchItem);
                                 yield return matchContext;
                             }
                             else

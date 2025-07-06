@@ -1,4 +1,4 @@
-using Singulink.Enums;
+using Singulink.Cryptography.Utilities;
 
 namespace Singulink.Cryptography;
 
@@ -10,8 +10,7 @@ public class ContextualSubject
 
     public ContextualSubject(string value, ContextualSubjectType type = ContextualSubjectType.General)
     {
-        if (!type.IsDefined())
-            throw new ArgumentOutOfRangeException(nameof(type), "Invalid contextual subject type.");
+        type.ThrowIfNotDefined(nameof(type));
 
         Value = value?.Trim() ?? string.Empty;
         Type = type;

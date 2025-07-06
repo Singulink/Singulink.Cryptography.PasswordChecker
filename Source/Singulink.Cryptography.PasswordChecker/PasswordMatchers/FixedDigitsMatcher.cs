@@ -1,3 +1,5 @@
+using Singulink.Cryptography.Utilities;
+
 namespace Singulink.Cryptography.PasswordMatchers;
 
 public class FixedDigitsMatcher : ValueMatcher
@@ -8,7 +10,9 @@ public class FixedDigitsMatcher : ValueMatcher
 
     public int MaxValue { get; }
 
-    public FixedDigitsMatcher(int numDigits, int minValue, int maxValue, bool matchRepeats, bool matchTrailingSeparator)
+    public PasswordMatchType MatchType { get; }
+
+    public FixedDigitsMatcher(int numDigits, int minValue, int maxValue, PasswordMatchType matchType, bool matchRepeats, bool matchTrailingSeparator)
         : base(matchRepeats, matchTrailingSeparator)
     {
         if (numDigits < 1 || numDigits > 9)
@@ -17,9 +21,12 @@ public class FixedDigitsMatcher : ValueMatcher
         if (minValue < 0 || maxValue < minValue || maxValue > Math.Pow(10, numDigits) - 1)
             throw new ArgumentOutOfRangeException(nameof(minValue), "Invalid range for digit matcher.");
 
+        matchType.ThrowIfNotDefined(nameof(matchType));
+
         NumDigits = numDigits;
         MinValue = minValue;
         MaxValue = maxValue;
+        MatchType = matchType;
     }
 
     protected override IEnumerable<PasswordMatchContext> GetValueMatches(PasswordMatchContext context)
@@ -38,6 +45,6 @@ public class FixedDigitsMatcher : ValueMatcher
         if (!parseResult || value < MinValue || value > MaxValue)
             return [];
 
-        return [context.CreateChild(NumDigits, p[..NumDigits].ToString())];
+        return [context.CreateChild(this, NumDigits, new PasswordMatchItem(p[..NumDigits].ToString(), MatchType))];
     }
 }

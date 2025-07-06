@@ -1,6 +1,23 @@
+using Singulink.Cryptography.Utilities;
+
 namespace Singulink.Cryptography;
 
-public struct PasswordMatchItem
+public record PasswordMatchItem
 {
-    public required string MatchedText { get; init; }
+    public string MatchedText { get; }
+
+    public PasswordMatchType MatchType { get; }
+
+    public PasswordMatchItem(string matchedText, PasswordMatchType matchType)
+    {
+        if (string.IsNullOrWhiteSpace(matchedText))
+            throw new ArgumentException("Matched text cannot be null or empty.", nameof(matchedText));
+
+        matchType.ThrowIfNotDefined(nameof(matchType));
+
+        MatchedText = matchedText;
+        MatchType = matchType;
+    }
+
+    public override string ToString() => $@"""{MatchedText}"" ({MatchType})";
 }
