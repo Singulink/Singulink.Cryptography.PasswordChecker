@@ -1,4 +1,4 @@
-using Singulink.Cryptography.Utilities;
+using Singulink.Enums;
 
 namespace Singulink.Cryptography.PasswordMatchers;
 
